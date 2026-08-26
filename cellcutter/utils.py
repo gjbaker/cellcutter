@@ -75,9 +75,7 @@ class Image:
         self.image = tifffile.TiffFile(path)
         self.base_series = self.image.series[0]
         self.cache_size = cache_size
-        self.zarr = zarr.open(
-            zarr.LRUStoreCache(self.image.aszarr(series=0), self.cache_size), mode="r"
-        )
+        self.zarr = zarr.open(self.image.aszarr(series=0), mode="r")
         self.zarr_no_cache = zarr.open(
             self.image.aszarr(series=0), mode="r"
         )

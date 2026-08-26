@@ -169,7 +169,7 @@ def rois_from_cell_data(
         logging.info(
             "Check if all cell IDs from the CSV are represented in the segmentation mask"
         )
-        cell_ids_not_in_segmentation_mask = np.in1d(
+        cell_ids_not_in_segmentation_mask = np.isin(
             cell_data["CellID"], segmentation_mask, invert=True
         )
         n_not_in_segmentation_mask = np.sum(cell_ids_not_in_segmentation_mask)
@@ -274,8 +274,8 @@ def process_image(
     # If writing to a zip file, create a temporary directory to store the zarr files
     # and compress them into the zip file at the end. Solves issues with concurrent
     # access to the same zip file.
-    store = zarr.DirectoryStore(str(destination)) if not use_zip else zarr.TempStore()
-    logging.info(f"Writing thumbnails to {store.path}")
+    store = zarr.storage.LocalStore(str(destination))
+    logging.info(f"Writing thumbnails to {destination}")
     # Chosing low compression level for speed. Size difference is negligible.
     file = zarr.create(
         store=store,
@@ -284,6 +284,7 @@ def process_image(
         dtype=img.dtype,
         compressor=Blosc(cname="zstd", clevel=2, shuffle=Blosc.SHUFFLE),
         chunks=array_chunks,
+        zarr_format=2,
     )
     mask_thumbnails = None
     if mask_cells:
