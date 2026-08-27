@@ -87,12 +87,10 @@ def cut_cell_range(
         channels=channels,
     )
     cut_array[..., cell_range[0] : cell_range[1], :, :] = cell_stack_temp
-    try:
-        logging.info(
-            f"Cache hits: {image.zarr.store.hits} Cache misses: {image.zarr.store.misses}"
-        )
-    except Exception:
-        pass
+    # FIXME: Logging not configured in ProcessPoolExecutor workers so this does nothing. Leaving it
+    # commented out for reference in case we switch to threads and want to resurrect it.
+    # size = round(image.zarr.store.cache_info()['current_size'] / 1024 / 1024, 1)
+    # logging.info(f"Cache size: {size} MB")
 
 
 def cut_cell_range_shared_mem(
